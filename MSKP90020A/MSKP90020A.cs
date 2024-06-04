@@ -864,6 +864,11 @@ namespace CSI.GMES.KP
                 {
                     e.RowHeight = 45;
                 }
+
+                if (e.RowHandle == 0)
+                {
+                    e.RowHeight = 190;
+                }
             }
             catch { }
         }
