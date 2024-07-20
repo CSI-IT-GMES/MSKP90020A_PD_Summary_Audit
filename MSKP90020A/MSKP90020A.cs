@@ -36,6 +36,7 @@ namespace CSI.GMES.KP
         public MyCellMergeHelper _Helper = null;
         bool _allow_confirm = false;
         public int _tab = 0;
+        public DataTable _dtChartSource = null;
 
         public MSKP90020A()
         {
@@ -180,10 +181,12 @@ namespace CSI.GMES.KP
                     if (_dtChart != null && _dtChart.Rows.Count > 0)
                     {
                         fn_load_chart(_dtChart);
+                        _dtChartSource = _dtChart.Copy();
                     }
                     else
                     {
                         chartData.DataSource = null;
+                        _dtChartSource = null;
                         while (chartData.Series[0].Points.Count > 0)
                         {
                             chartData.Series[0].Points.Clear();
@@ -1517,6 +1520,58 @@ namespace CSI.GMES.KP
                 }
             }
             catch { }
+        }
+
+        private void chartData_MouseClick(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                this.Cursor = Cursors.Hand;
+
+                ChartControl chart = sender as ChartControl;
+                if (chart == null || chart.DataSource == null) return;
+
+                // Get hit information under the mouse cursor
+                ChartHitInfo hitInfo = chart.CalcHitInfo(e.Location);
+
+                // Check if the clicked element is a series point
+                if (hitInfo.InSeries && hitInfo.SeriesPoint != null)
+                {
+                    // Get the argument of the clicked point
+                    string _col_nm = hitInfo.SeriesPoint.Argument;
+
+                    for (int iRow = 0; iRow < _dtChartSource.Rows.Count; iRow++)
+                    {
+                        if (_dtChartSource.Rows[iRow]["LINE_NM"].ToString() == _col_nm)
+                        {
+                            string _fty_cd = _dtChartSource.Rows[iRow]["FTY_CD"].ToString();
+                            string _line_cd = _dtChartSource.Rows[iRow]["LINE_CD"].ToString();
+                            string _date = cboMonth.yyyymm;
+
+                            ////Disable auto change 
+                            _firstLoad = true;
+
+                            cboDate.EditValue = _date + "01";
+                            cboFactory.EditValue = _fty_cd;
+                            LoadDataCbo(cboPlant, "Plant", "Q_LINE");
+                            cboPlant.EditValue = _line_cd;
+                            tabControl.SelectedTabPageIndex = 1;
+
+                            ////Click event
+                            QueryClick();
+
+                            ////Open auto change 
+                            _firstLoad = false;
+
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         #endregion
