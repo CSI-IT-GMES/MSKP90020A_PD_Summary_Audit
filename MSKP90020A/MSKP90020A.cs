@@ -36,7 +36,7 @@ namespace CSI.GMES.KP
         public MyCellMergeHelper _Helper = null;
         bool _allow_confirm = false;
         public int _tab = 0;
-        public DataTable _dtChartSource = null;
+        public DataTable _dtChartSource = null, _dtSummarySource = null;
 
         public MSKP90020A()
         {
@@ -177,6 +177,8 @@ namespace CSI.GMES.KP
                     InitControls(grdSummary);
                     DataTable _dtSource = GetData("Q_SUMMARY");
                     DataTable _dtChart = GetData("Q_SUMMARY_CHART");
+                    _dtChartSource = null;
+                    _dtSummarySource = null;
 
                     if (_dtChart != null && _dtChart.Rows.Count > 0)
                     {
@@ -186,7 +188,6 @@ namespace CSI.GMES.KP
                     else
                     {
                         chartData.DataSource = null;
-                        _dtChartSource = null;
                         while (chartData.Series[0].Points.Count > 0)
                         {
                             chartData.Series[0].Points.Clear();
@@ -195,6 +196,7 @@ namespace CSI.GMES.KP
 
                     if (_dtSource != null && _dtSource.Rows.Count > 0)
                     {
+                        _dtSummarySource = _dtSource.Copy();
                         var distinctValues = _dtSource.AsEnumerable()
                                 .Select(row => new
                                 {
@@ -1572,6 +1574,45 @@ namespace CSI.GMES.KP
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void gvwSummary_RowCellClick(object sender, RowCellClickEventArgs e)
+        {
+            try
+            {
+                if (grdSummary.DataSource == null || gvwSummary.RowCount < 1) return;
+
+                string _col_nm = e.Column.FieldName.ToString();
+
+                for(int iRow = 0; iRow < _dtSummarySource.Rows.Count; iRow++)
+                {
+                    if (_dtSummarySource.Rows[iRow]["LINE_CD"].ToString() == _col_nm)
+                    {
+                        string _fty_cd = _dtChartSource.Rows[iRow]["FTY_CD"].ToString();
+                        string _line_cd = _dtChartSource.Rows[iRow]["LINE_CD"].ToString();
+                        string _date = cboMonth.yyyymm;
+
+                        ////Disable auto change 
+                        _firstLoad = true;
+
+                        cboDate.EditValue = _date + "01";
+                        cboFactory.EditValue = _fty_cd;
+                        LoadDataCbo(cboPlant, "Plant", "Q_LINE");
+                        cboPlant.EditValue = _line_cd;
+                        tabControl.SelectedTabPageIndex = 1;
+
+                        ////Click event
+                        QueryClick();
+
+                        ////Open auto change 
+                        _firstLoad = false;
+
+                        break;
+                    }
+                }
+
+            }
+            catch { }
         }
 
         #endregion
