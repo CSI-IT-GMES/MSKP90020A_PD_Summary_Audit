@@ -37,6 +37,7 @@ namespace CSI.GMES.KP
         bool _allow_confirm = false;
         public int _tab = 0;
         public DataTable _dtChartSource = null, _dtSummarySource = null;
+        public string _state = "MONTH";
 
         public MSKP90020A()
         {
@@ -58,6 +59,7 @@ namespace CSI.GMES.KP
 
             cboDate.EditValue = DateTime.Now.ToString();
             cboMonth.EditValue = DateTime.Now.ToString();
+            cboMonthT.EditValue = DateTime.Now.ToString();
             panTop.BackColor = Color.FromArgb(240, 240, 240);
             tabControl.BackColor = Color.FromArgb(240, 240, 240);
 
@@ -71,47 +73,110 @@ namespace CSI.GMES.KP
         {
             if (_tab.Equals(0))
             {
-                panTop.Height = 50;
+                if (_state.Equals("MONTH"))
+                {
+                    panTop.Height = 50;
 
-                cboMonth.Visible = true;
-                cboDate.Visible = false;
+                    cboMonth.Visible = true;
+                    cboDate.Visible = false;
 
-                cboMonth.Location = new Point(68, 13);
-                cboDate.Location = new Point(551, 13);
+                    cboMonth.Location = new Point(68, 13);
+                    cboDate.Location = new Point(551, 13);
 
-                lbFactory.Visible = false;
-                lbPlant.Visible = false;
-                btnExport.Visible = true;
+                    lbFactory.Visible = false;
+                    lbFactory.Location = new Point(206, 8);
+                    lbPlant.Visible = false;
+                    btnExport.Visible = true;
 
-                cboFactory.Visible = false;
-                cboPlant.Visible = false;
+                    cboFactory.Visible = false;
+                    cboFactory.Location = new Point(271, 8);
+                    cboPlant.Visible = false;
 
-                lbDate.Text = "Month";
-                btnExport.Location = new Point(410, 13);
-                lbDate.Location = new Point(3, 13);
-                cboDate.Location = new Point(68, 13);
+                    lbDate.Text = "Month";
+                    lbDate.Width = 64;
+                    btnExport.Location = new Point(600, 13);
+                    lbDate.Location = new Point(3, 13);
+                    cboDate.Location = new Point(68, 13);
 
-                lbGreen.Location = new Point(670, 13);
-                lbYellow.Location = new Point(832, 13);
-                lbRed.Location = new Point(979, 13);
-                lbBlack.Location = new Point(1126, 13);
+                    lbGreen.Location = new Point(860, 13);
+                    lbYellow.Location = new Point(1022, 13);
+                    lbRed.Location = new Point(1169, 13);
+                    lbBlack.Location = new Point(1316, 13);
 
-                lbGreen.Text = "90% <= Rate <= 100%";
-                lbYellow.Text = "80% <= Rate < 90%";
-                lbRed.Text = "70% <= Rate < 80%";
-                lbBlack.Text = "< 70%";
+                    lbGreen.Text = "90% <= Rate <= 100%";
+                    lbYellow.Text = "80% <= Rate < 90%";
+                    lbRed.Text = "70% <= Rate < 80%";
+                    lbBlack.Text = "Rate < 70%";
 
-                lbGroup.Visible = true;
-                cboGroup.Visible = true;
+                    lbGroup.Visible = true;
+                    cboGroup.Visible = true;
 
-                lbGroup.Location = new Point(200, 13);
-                cboGroup.Location = new Point(265, 13);
+                    lbGroup.Location = new Point(200, 13);
+                    cboGroup.Location = new Point(265, 13);
 
-                btnConfirm.Visible = false;
-                btnConfirm.Location = new Point(888, 8);
+                    btnConfirm.Visible = false;
+                    btnConfirm.Location = new Point(888, 8);
 
-                btnUnconfirm.Visible = true;
-                btnUnconfirm.Location = new Point(535, 13);
+                    btnUnconfirm.Visible = true;
+                    btnUnconfirm.Location = new Point(725, 13);
+
+                    grpCboType.Visible = true;
+                    grpCboType.Location = new Point(410, 10);
+
+                    lbDateT.Visible = false;
+                    lbDateT.Location = new Point(1012, 41);
+                    cboMonthT.Visible = false;
+                    cboMonthT.Location = new Point(1012, 40);
+                }
+                else if (_state.Equals("YEAR"))
+                {
+                    panTop.Height = 75;
+
+                    btnConfirm.Visible = false;
+                    btnUnconfirm.Visible = false;
+                    btnExport.Visible = false;
+
+                    cboMonth.Visible = true;
+                    cboDate.Visible = false;
+
+                    cboMonth.Location = new Point(104, 40);
+                    cboDate.Location = new Point(551, 8);
+
+                    lbFactory.Visible = true;
+                    lbFactory.Location = new Point(39, 8);
+                    lbPlant.Visible = true;
+                    lbPlant.Location = new Point(265, 8);
+
+                    cboFactory.Visible = true;
+                    cboFactory.Location = new Point(104, 8);
+                    cboPlant.Visible = true;
+                    cboPlant.Location = new Point(320, 8);
+
+                    lbDate.Text = "Month From";
+                    lbDate.Width = 100;
+                    lbDate.Location = new Point(3, 40);
+
+                    lbGreen.Location = new Point(470, 40);
+                    lbYellow.Location = new Point(632, 40);
+                    lbRed.Location = new Point(779, 40);
+                    lbBlack.Location = new Point(926, 40);
+
+                    lbGreen.Text = "90% <= Rate <= 100%";
+                    lbYellow.Text = "80% <= Rate < 90%";
+                    lbRed.Text = "70% <= Rate < 80%";
+                    lbBlack.Text = "Rate < 70%";
+
+                    lbGroup.Visible = false;
+                    cboGroup.Visible = false;
+
+                    grpCboType.Visible = true;
+                    grpCboType.Location = new Point(470, 5);
+
+                    lbDateT.Visible = true;
+                    lbDateT.Location = new Point(245, 40);
+                    cboMonthT.Visible = true;
+                    cboMonthT.Location = new Point(320, 40);
+                }
             }
             else if (_tab.Equals(1))
             {
@@ -124,13 +189,16 @@ namespace CSI.GMES.KP
                 cboMonth.Location = new Point(551, 13);
 
                 lbFactory.Visible = true;
+                lbFactory.Location = new Point(206, 8);
                 lbPlant.Visible = true;
                 btnExport.Visible = false;
 
                 cboFactory.Visible = true;
+                cboFactory.Location = new Point(271, 8);
                 cboPlant.Visible = true;
 
                 lbDate.Text = "Date";
+                lbDate.Width = 64;
                 lbDate.Location = new Point(3, 13);
                 lbFactory.Location = new Point(206, 13);
                 lbPlant.Location = new Point(410, 13);
@@ -147,7 +215,7 @@ namespace CSI.GMES.KP
                 lbGreen.Text = "90 <= Result <= 100";
                 lbYellow.Text = "80 <= Result < 90";
                 lbRed.Text = "70 <= Result < 80";
-                lbBlack.Text = "< 70";
+                lbBlack.Text = "Rate < 70";
 
                 lbGroup.Visible = false;
                 cboGroup.Visible = false;
@@ -160,6 +228,13 @@ namespace CSI.GMES.KP
 
                 btnUnconfirm.Visible = false;
                 btnUnconfirm.Location = new Point(1004, 8);
+
+                grpCboType.Visible = false;
+
+                lbDateT.Visible = false;
+                lbDateT.Location = new Point(1012, 41);
+                cboMonthT.Visible = false;
+                cboMonthT.Location = new Point(1012, 40);
             }
         }
 
@@ -174,42 +249,85 @@ namespace CSI.GMES.KP
 
                 if (_tab.Equals(0))
                 {
-                    InitControls(grdSummary);
-                    DataTable _dtSource = GetData("Q_SUMMARY");
-                    DataTable _dtChart = GetData("Q_SUMMARY_CHART");
-                    _dtChartSource = null;
-                    _dtSummarySource = null;
+                    if (_state.Equals("MONTH"))
+                    {
+                        InitControls(grdSummary);
+                        DataTable _dtSource = GetData("Q_SUMMARY");
+                        DataTable _dtChart = GetData("Q_SUMMARY_CHART");
+                        _dtChartSource = null;
+                        _dtSummarySource = null;
 
-                    if (_dtChart != null && _dtChart.Rows.Count > 0)
-                    {
-                        fn_load_chart(_dtChart);
-                        _dtChartSource = _dtChart.Copy();
-                    }
-                    else
-                    {
-                        chartData.DataSource = null;
-                        while (chartData.Series[0].Points.Count > 0)
+                        if (_dtChart != null && _dtChart.Rows.Count > 0)
                         {
-                            chartData.Series[0].Points.Clear();
+                            fn_load_chart(_dtChart);
+                            _dtChartSource = _dtChart.Copy();
+                        }
+                        else
+                        {
+                            chartData.DataSource = null;
+                            while (chartData.Series[0].Points.Count > 0)
+                            {
+                                chartData.Series[0].Points.Clear();
+                            }
+                        }
+
+                        if (_dtSource != null && _dtSource.Rows.Count > 0)
+                        {
+                            _dtSummarySource = _dtSource.Copy();
+                            var distinctValues = _dtSource.AsEnumerable()
+                                    .Select(row => new
+                                    {
+                                        GRP_NM = row.Field<string>("GRP_NM"),
+                                        LINE_CD = row.Field<string>("LINE_CD"),
+                                        LINE_NM = row.Field<string>("LINE_NM"),
+                                    })
+                                    .Distinct();
+                            DataTable _dtHead = LINQResultToDataTable(distinctValues).Select("", "").CopyToDataTable();
+                            CreateDetailGrid(grdSummary, gvwSummary, _dtHead);
+                            DataTable _dtf = Binding_Data(_dtSource);
+                            SetData(grdSummary, _dtf);
+                            Formart_Grid_Summary();
                         }
                     }
-
-                    if (_dtSource != null && _dtSource.Rows.Count > 0)
+                    else if (_state.Equals("YEAR"))
                     {
-                        _dtSummarySource = _dtSource.Copy();
-                        var distinctValues = _dtSource.AsEnumerable()
-                                .Select(row => new
-                                {
-                                    GRP_NM = row.Field<string>("GRP_NM"),
-                                    LINE_CD = row.Field<string>("LINE_CD"),
-                                    LINE_NM = row.Field<string>("LINE_NM"),
-                                })
-                                .Distinct();
-                        DataTable _dtHead = LINQResultToDataTable(distinctValues).Select("", "").CopyToDataTable();
-                        CreateDetailGrid(grdSummary, gvwSummary, _dtHead);
-                        DataTable _dtf = Binding_Data(_dtSource);
-                        SetData(grdSummary, _dtf);
-                        Formart_Grid_Summary();
+                        InitControls(grdSummary);
+                        DataTable _dtSource = GetDataPop("Q_YEARLY");
+                        DataTable _dtChart = GetDataPop("Q_YEARLY_CHART");
+                        _dtChartSource = null;
+                        _dtSummarySource = null;
+
+                        if (_dtChart != null && _dtChart.Rows.Count > 0)
+                        {
+                            fn_load_chart(_dtChart);
+                            _dtChartSource = _dtChart.Copy();
+                        }
+                        else
+                        {
+                            chartData.DataSource = null;
+                            while (chartData.Series[0].Points.Count > 0)
+                            {
+                                chartData.Series[0].Points.Clear();
+                            }
+                        }
+
+                        if (_dtSource != null && _dtSource.Rows.Count > 0)
+                        {
+                            _dtSummarySource = _dtSource.Copy();
+                            var distinctValues = _dtSource.AsEnumerable()
+                                    .Select(row => new
+                                    {
+                                        GRP_NM = row.Field<string>("GRP_NM"),
+                                        YMD = row.Field<string>("YMD"),
+                                        YMD_CAPTION = row.Field<string>("YMD_CAPTION"),
+                                    })
+                                    .Distinct();
+                            DataTable _dtHead = LINQResultToDataTable(distinctValues).Select("", "").CopyToDataTable();
+                            CreateDetailGrid(grdSummary, gvwSummary, _dtHead);
+                            DataTable _dtf = Binding_Data(_dtSource);
+                            SetData(grdSummary, _dtf);
+                            Formart_Grid_Summary();
+                        }
                     }
                 }
                 else if (_tab.Equals(1))
@@ -295,7 +413,15 @@ namespace CSI.GMES.KP
                         _distinct_row = dtSource.Rows[iRow]["DIV"].ToString();
                     }
 
-                    _col_nm = dtSource.Rows[iRow]["LINE_CD"].ToString();
+                    if (_state.Equals("MONTH"))
+                    {
+                        _col_nm = dtSource.Rows[iRow]["LINE_CD"].ToString();
+                    }
+                    else if (_state.Equals("YEAR"))
+                    {
+                        _col_nm = dtSource.Rows[iRow]["YMD"].ToString();
+                    }
+
                     _dtf.Rows[_dtf.Rows.Count - 1][_col_nm] = dtSource.Rows[iRow]["QTY"].ToString();
                 }
 
@@ -328,10 +454,21 @@ namespace CSI.GMES.KP
                 ConstantLine constantLine1 = diagOSD.AxisY.ConstantLines[0];
                 constantLine1.AxisValueSerializable = _dtSource.Rows[0]["TARGET"].ToString();
 
-                for (int i = 0; i < _dtSource.Rows.Count; i++)
+                if (_state.Equals("MONTH"))
                 {
-                    string label = _dtSource.Rows[i]["LINE_NM"].ToString();
-                    chartData.Series[0].Points.Add(new SeriesPoint(label, _dtSource.Rows[i]["QTY"].ToString()));
+                    for (int i = 0; i < _dtSource.Rows.Count; i++)
+                    {
+                        string label = _dtSource.Rows[i]["LINE_NM"].ToString();
+                        chartData.Series[0].Points.Add(new SeriesPoint(label, _dtSource.Rows[i]["QTY"].ToString()));
+                    }
+                }
+                else if (_state.Equals("YEAR"))
+                {
+                    for (int i = 0; i < _dtSource.Rows.Count; i++)
+                    {
+                        string label = _dtSource.Rows[i]["YMD_CAPTION"].ToString();
+                        chartData.Series[0].Points.Add(new SeriesPoint(label, _dtSource.Rows[i]["QTY"].ToString()));
+                    }
                 }
 
                 for (int iRow = 0; iRow < _dtSource.Rows.Count; iRow++)
@@ -581,18 +718,37 @@ namespace CSI.GMES.KP
                     colBand.Width = 100;
                     gridBand.Columns.Add(colBand);
 
-                    for (int iRow = 0; iRow < dtSource.Rows.Count; iRow++)
+                    if (_state.Equals("MONTH"))
                     {
-                        gridBand = new GridBandEx() { Caption = dtSource.Rows[iRow]["LINE_NM"].ToString() };
-                        gridView.Bands.Add(gridBand);
-                        gridBand.AppearanceHeader.TextOptions.WordWrap = WordWrap.Wrap;
-                        gridBand.AppearanceHeader.TextOptions.HAlignment = HorzAlignment.Center;
-                        gridBand.AppearanceHeader.Options.UseBackColor = true;
-                        gridBand.RowCount = 2;
+                        for (int iRow = 0; iRow < dtSource.Rows.Count; iRow++)
+                        {
+                            gridBand = new GridBandEx() { Caption = dtSource.Rows[iRow]["LINE_NM"].ToString() };
+                            gridView.Bands.Add(gridBand);
+                            gridBand.AppearanceHeader.TextOptions.WordWrap = WordWrap.Wrap;
+                            gridBand.AppearanceHeader.TextOptions.HAlignment = HorzAlignment.Center;
+                            gridBand.AppearanceHeader.Options.UseBackColor = true;
+                            gridBand.RowCount = 2;
 
-                        colBand = new BandedGridColumnEx() { FieldName = dtSource.Rows[iRow]["LINE_CD"].ToString(), Visible = true };
-                        colBand.Width = 75;
-                        gridBand.Columns.Add(colBand);
+                            colBand = new BandedGridColumnEx() { FieldName = dtSource.Rows[iRow]["LINE_CD"].ToString(), Visible = true };
+                            colBand.Width = 75;
+                            gridBand.Columns.Add(colBand);
+                        }
+                    }
+                    else if (_state.Equals("YEAR"))
+                    {
+                        for (int iRow = 0; iRow < dtSource.Rows.Count; iRow++)
+                        {
+                            gridBand = new GridBandEx() { Caption = dtSource.Rows[iRow]["YMD_CAPTION"].ToString() };
+                            gridView.Bands.Add(gridBand);
+                            gridBand.AppearanceHeader.TextOptions.WordWrap = WordWrap.Wrap;
+                            gridBand.AppearanceHeader.TextOptions.HAlignment = HorzAlignment.Center;
+                            gridBand.AppearanceHeader.Options.UseBackColor = true;
+                            gridBand.RowCount = 2;
+
+                            colBand = new BandedGridColumnEx() { FieldName = dtSource.Rows[iRow]["YMD"].ToString(), Visible = true };
+                            colBand.Width = 75;
+                            gridBand.Columns.Add(colBand);
+                        }
                     }
                 }
                 else if (_tab.Equals(1))
@@ -674,6 +830,32 @@ namespace CSI.GMES.KP
 
                     dtData = proc.SetParamData(dtData, argType, _factory, _plant, cboDate.yyyymmdd);
                 }
+
+                ResultSet rs = CommonCallQuery(dtData, proc.ProcName, proc.GetParamInfo(), false, 90000, "", true);
+                if (rs == null || rs.ResultDataSet == null || rs.ResultDataSet.Tables.Count == 0 || rs.ResultDataSet.Tables[0].Rows.Count == 0)
+                {
+                    return null;
+                }
+                return rs.ResultDataSet.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        private DataTable GetDataPop(string argType)
+        {
+            try
+            {
+                P_MSKP90020A_POP proc = new P_MSKP90020A_POP();
+                DataTable dtData = null;
+
+                string _factory = cboFactory.EditValue == null ? "" : cboFactory.EditValue.ToString();
+                string _plant = cboPlant.EditValue == null ? "" : cboPlant.EditValue.ToString();
+
+                dtData = proc.SetParamData(dtData, argType, _factory, _plant, cboMonth.yyyymm, cboMonthT.yyyymm);
 
                 ResultSet rs = CommonCallQuery(dtData, proc.ProcName, proc.GetParamInfo(), false, 90000, "", true);
                 if (rs == null || rs.ResultDataSet == null || rs.ResultDataSet.Tables.Count == 0 || rs.ResultDataSet.Tables[0].Rows.Count == 0)
@@ -992,6 +1174,24 @@ namespace CSI.GMES.KP
                 pbProgressHide();
                 MessageBox.Show(ex.Message);
                 return false;
+            }
+        }
+
+        private void radMonthly_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!_firstLoad && radMonthly.Checked)
+            {
+                _state = "MONTH";
+                FormatLayout();
+            }
+        }
+
+        private void radYearly_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!_firstLoad && radYearly.Checked)
+            {
+                _state = "YEAR";
+                FormatLayout();
             }
         }
 
@@ -1528,8 +1728,6 @@ namespace CSI.GMES.KP
         {
             try
             {
-                this.Cursor = Cursors.Hand;
-
                 ChartControl chart = sender as ChartControl;
                 if (chart == null || chart.DataSource == null) return;
 
@@ -1544,7 +1742,54 @@ namespace CSI.GMES.KP
 
                     for (int iRow = 0; iRow < _dtChartSource.Rows.Count; iRow++)
                     {
-                        if (_dtChartSource.Rows[iRow]["LINE_NM"].ToString() == _col_nm)
+                        if (_state.Equals("MONTH"))
+                        {
+                            if (_dtChartSource.Rows[iRow]["LINE_NM"].ToString() == _col_nm)
+                            {
+                                string _fty_cd = _dtChartSource.Rows[iRow]["FTY_CD"].ToString();
+                                string _line_cd = _dtChartSource.Rows[iRow]["LINE_CD"].ToString();
+                                string _date = cboMonth.yyyymm;
+
+                                ////Disable auto change 
+                                _firstLoad = true;
+
+                                cboDate.EditValue = _date + "01";
+                                cboFactory.EditValue = _fty_cd;
+                                LoadDataCbo(cboPlant, "Plant", "Q_LINE");
+                                cboPlant.EditValue = _line_cd;
+                                tabControl.SelectedTabPageIndex = 1;
+
+                                ////Click event
+                                QueryClick();
+
+                                ////Open auto change 
+                                _firstLoad = false;
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void gvwSummary_RowCellClick(object sender, RowCellClickEventArgs e)
+        {
+            try
+            {
+                if (grdSummary.DataSource == null || gvwSummary.RowCount < 1) return;
+
+                string _col_nm = e.Column.FieldName.ToString();
+
+                for(int iRow = 0; iRow < _dtSummarySource.Rows.Count; iRow++)
+                {
+                    if (_state.Equals("MONTH"))
+                    {
+                        if (_dtSummarySource.Rows[iRow]["LINE_CD"].ToString() == _col_nm)
                         {
                             string _fty_cd = _dtChartSource.Rows[iRow]["FTY_CD"].ToString();
                             string _line_cd = _dtChartSource.Rows[iRow]["LINE_CD"].ToString();
@@ -1569,48 +1814,43 @@ namespace CSI.GMES.KP
                         }
                     }
                 }
+
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            catch { }
         }
 
-        private void gvwSummary_RowCellClick(object sender, RowCellClickEventArgs e)
+        private void chartData_CustomDrawCrosshair(object sender, CustomDrawCrosshairEventArgs e)
         {
             try
             {
-                if (grdSummary.DataSource == null || gvwSummary.RowCount < 1) return;
+                if (chartData.DataSource == null) return;
 
-                string _col_nm = e.Column.FieldName.ToString();
-
-                for(int iRow = 0; iRow < _dtSummarySource.Rows.Count; iRow++)
+                foreach (CrosshairElementGroup group in e.CrosshairElementGroups)
                 {
-                    if (_dtSummarySource.Rows[iRow]["LINE_CD"].ToString() == _col_nm)
-                    {
-                        string _fty_cd = _dtChartSource.Rows[iRow]["FTY_CD"].ToString();
-                        string _line_cd = _dtChartSource.Rows[iRow]["LINE_CD"].ToString();
-                        string _date = cboMonth.yyyymm;
+                    CrosshairGroupHeaderElement groupHeaderElement = group.HeaderElement;
+                    // Obtain the first series.
+                    CrosshairElement element = group.CrosshairElements[0];
 
-                        ////Disable auto change 
-                        _firstLoad = true;
-
-                        cboDate.EditValue = _date + "01";
-                        cboFactory.EditValue = _fty_cd;
-                        LoadDataCbo(cboPlant, "Plant", "Q_LINE");
-                        cboPlant.EditValue = _line_cd;
-                        tabControl.SelectedTabPageIndex = 1;
-
-                        ////Click event
-                        QueryClick();
-
-                        ////Open auto change 
-                        _firstLoad = false;
-
-                        break;
-                    }
+                    // Format the text shown for the series in the crosshair cursor label. Specify the text color and marker size. 
+                    element.LabelElement.MarkerSize = new Size(15, 15);
+                    element.LabelElement.Font = new Font("Tahoma", 8, FontStyle.Bold);
+                    element.LabelElement.Text = string.Format("{0}: {1}%", element.SeriesPoint.Argument.Replace("_",""), element.SeriesPoint.Values[0]);
                 }
+            }
+            catch { }
+        }
 
+        private void chartData_CustomDrawAxisLabel(object sender, CustomDrawAxisLabelEventArgs e)
+        {
+            try
+            {
+                if (chartData.DataSource == null) return;
+
+                if (_state.Equals("YEAR"))
+                {
+                    AxisBase axis = e.Item.Axis;
+                    e.Item.Text = e.Item.Text.Replace("_", "");
+                }
             }
             catch { }
         }
@@ -1654,6 +1894,50 @@ namespace CSI.GMES.KP
                                                 ARG_FTY,
                                                 ARG_LINE,
                                                 ARG_YMD
+                };
+                dataTable.Rows.Add(objData);
+                return dataTable;
+            }
+        }
+
+        public class P_MSKP90020A_POP : BaseProcClass
+        {
+            public P_MSKP90020A_POP()
+            {
+                // Modify Code : Procedure Name
+                _ProcName = "LMES.P_MSKP90020A_POP";
+                ParamAdd();
+            }
+            private void ParamAdd()
+            {
+                _ParamInfo.Add(new ParamInfo("@ARG_WORK_TYPE", "Varchar", 100, "Input", typeof(System.String)));
+                _ParamInfo.Add(new ParamInfo("@ARG_FTY", "Varchar", 100, "Input", typeof(System.String)));
+                _ParamInfo.Add(new ParamInfo("@ARG_LINE", "Varchar", 100, "Input", typeof(System.String)));
+                _ParamInfo.Add(new ParamInfo("@ARG_DATEF", "Varchar", 100, "Input", typeof(System.String)));
+                _ParamInfo.Add(new ParamInfo("@ARG_DATET", "Varchar", 100, "Input", typeof(System.String)));
+            }
+            public DataTable SetParamData(DataTable dataTable,
+                                        System.String ARG_WORK_TYPE,
+                                        System.String ARG_FTY,
+                                        System.String ARG_LINE,
+                                        System.String ARG_DATEF,
+                                        System.String ARG_DATET)
+            {
+                if (dataTable == null)
+                {
+                    dataTable = new DataTable(_ProcName);
+                    foreach (ParamInfo pi in _ParamInfo)
+                    {
+                        dataTable.Columns.Add(pi.ParamName, pi.TypeClass);
+                    }
+                }
+                // Modify Code : Procedure Parameter
+                object[] objData = new object[] {
+                                                ARG_WORK_TYPE,
+                                                ARG_FTY,
+                                                ARG_LINE,
+                                                ARG_DATEF,
+                                                ARG_DATET
                 };
                 dataTable.Rows.Add(objData);
                 return dataTable;
