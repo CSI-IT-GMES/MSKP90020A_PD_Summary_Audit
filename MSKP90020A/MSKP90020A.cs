@@ -63,6 +63,10 @@ namespace CSI.GMES.KP
             panTop.BackColor = Color.FromArgb(240, 240, 240);
             tabControl.BackColor = Color.FromArgb(240, 240, 240);
 
+            txtPIC.ForeColor = Color.FromArgb(0, 104, 140);
+            txtPIC.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near;
+            txtPIC.Width = 550;
+
             InitCombobox();
             FormatLayout();
 
@@ -177,10 +181,17 @@ namespace CSI.GMES.KP
                     cboMonthT.Visible = true;
                     cboMonthT.Location = new Point(320, 40);
                 }
+
+                txtPIC.Text = "";
+                txtPIC.Visible = false;
+
+                lbYellow.Width = 148;
+                lbRed.Width = 148;
+                lbBlack.Width = 148;
             }
             else if (_tab.Equals(1))
             {
-                panTop.Height = 55;
+                panTop.Height = 75;
 
                 cboMonth.Visible = false;
                 cboDate.Visible = true;
@@ -199,23 +210,27 @@ namespace CSI.GMES.KP
 
                 lbDate.Text = "Date";
                 lbDate.Width = 64;
-                lbDate.Location = new Point(3, 13);
-                lbFactory.Location = new Point(206, 13);
-                lbPlant.Location = new Point(410, 13);
+                lbDate.Location = new Point(3, 8);
+                lbFactory.Location = new Point(206, 8);
+                lbPlant.Location = new Point(410, 8);
 
-                cboDate.Location = new Point(68, 13);
-                cboFactory.Location = new Point(271, 13);
-                cboPlant.Location = new Point(460, 13);
+                cboDate.Location = new Point(68, 8);
+                cboFactory.Location = new Point(271, 8);
+                cboPlant.Location = new Point(460, 8);
 
-                lbGreen.Location = new Point(730, 13);
-                lbYellow.Location = new Point(892, 13);
-                lbRed.Location = new Point(1039, 13);
-                lbBlack.Location = new Point(1186, 13);
+                lbGreen.Location = new Point(68, 40);
+                lbYellow.Location = new Point(230, 40);
+                lbRed.Location = new Point(388, 40);
+                lbBlack.Location = new Point(545, 40);
+
+                lbYellow.Width = 160;
+                lbRed.Width = 160;
+                lbBlack.Width = 160;
 
                 lbGreen.Text = "90 <= Result <= 100";
                 lbYellow.Text = "80 <= Result < 90";
                 lbRed.Text = "70 <= Result < 80";
-                lbBlack.Text = "Rate < 70";
+                lbBlack.Text = "Result < 70";
 
                 lbGroup.Visible = false;
                 cboGroup.Visible = false;
@@ -224,7 +239,8 @@ namespace CSI.GMES.KP
                 cboGroup.Location = new Point(752, 40);
 
                 btnConfirm.Visible = true;
-                btnConfirm.Location = new Point(605, 13);
+                btnConfirm.Location = new Point(605, 8);
+                btnConfirm.Width = 100;
 
                 btnUnconfirm.Visible = false;
                 btnUnconfirm.Location = new Point(1004, 8);
@@ -235,6 +251,10 @@ namespace CSI.GMES.KP
                 lbDateT.Location = new Point(1012, 41);
                 cboMonthT.Visible = false;
                 cboMonthT.Location = new Point(1012, 40);
+
+                txtPIC.Text = "";
+                txtPIC.Visible = true;
+                txtPIC.Location = new Point(730, 8);
             }
         }
 
@@ -346,6 +366,17 @@ namespace CSI.GMES.KP
 
                     if (_dtSource != null && _dtSource.Rows.Count > 0)
                     {
+                        if (!string.IsNullOrEmpty(_dtSource.Rows[0]["CHECK_USER"].ToString()))
+                        {
+                            txtPIC.Visible = true;
+                            txtPIC.Text = "User name: " + _dtSource.Rows[0]["CHECK_USER"].ToString();
+                        }
+                        else
+                        {
+                            txtPIC.Visible = false;
+                            txtPIC.Text = "";
+                        }
+
                         for (int iRow = 0; iRow < _dtSource.Rows.Count; iRow++)
                         {
                             if (!string.IsNullOrEmpty(_dtSource.Rows[iRow]["GRP_NAME_VN"].ToString()))
