@@ -227,10 +227,10 @@ namespace CSI.GMES.KP
                 lbRed.Width = 160;
                 lbBlack.Width = 160;
 
-                lbGreen.Text = "90 <= Result <= 100";
-                lbYellow.Text = "80 <= Result < 90";
-                lbRed.Text = "70 <= Result < 80";
-                lbBlack.Text = "Result < 70";
+                lbGreen.Text = "90% <= Rate <= 100%";
+                lbYellow.Text = "80% <= Rate < 90%";
+                lbRed.Text = "70% <= Rate < 80%";
+                lbBlack.Text = "Rate < 70%";
 
                 lbGroup.Visible = false;
                 cboGroup.Visible = false;
@@ -566,7 +566,15 @@ namespace CSI.GMES.KP
                         _max_qty = string.IsNullOrEmpty(_dtf.Rows[iRow]["MAX_SCORE"].ToString()) ? 0 : Int32.Parse(_dtf.Rows[iRow]["MAX_SCORE"].ToString());
                         _result_qty = string.IsNullOrEmpty(_dtf.Rows[iRow]["RESULT_SCORE"].ToString()) ? 0 : Int32.Parse(_dtf.Rows[iRow]["RESULT_SCORE"].ToString());
 
-                        if (_result_qty < 0 || _result_qty > _max_qty)
+                        if (_result_qty.Equals(-1)) continue;
+                        if (_dtf.Rows[iRow]["GRP_CD"].ToString().ToUpper().Equals("TOTAL"))
+                        {
+                            _dtf.Rows.RemoveAt(iRow);
+                            _dtf.AcceptChanges();
+                            continue;
+                        }
+
+                        if (_result_qty < -1 || _result_qty > _max_qty)
                         {
                             MessageBox.Show("Số điểm thực tế phải trong khoảng từ 0 ~ Điểm tối đa!!!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             return;
@@ -801,8 +809,8 @@ namespace CSI.GMES.KP
                     int _col_end = Int32.Parse(dtSource.Rows[0]["FIXED_COL_END"].ToString());
 
                     string[] _col_caption = {"Mission\n(Mục tiêu)","Category\n(Hạng mục đánh giá)",
-                        "No\n(STT)", "Max Score\n(Chỉ tiêu)", "Actual Score\n(Kết quả)", "Remark\n(Ghi chú lý do)"};
-                    string[] _col_field = { "GRP_NAME_VN", "ITEM_NAME_VN", "ORD_NO", "MAX_SCORE", "RESULT_SCORE", "REASON" };
+                        "No\n(STT)", "Max Score\n(Chỉ tiêu)", "Actual Score\n(Kết quả)", "Remark\n(Ghi chú lý do)", "RESULT_RATE"};
+                    string[] _col_field = { "GRP_NAME_VN", "ITEM_NAME_VN", "ORD_NO", "MAX_SCORE", "RESULT_SCORE", "REASON", "RESULT_RATE" };
 
                     for (int iRow = 0; iRow < dtSource.Columns.Count; iRow++)
                     {
@@ -821,6 +829,11 @@ namespace CSI.GMES.KP
                         gridBand.AppearanceHeader.Options.UseBackColor = true;
                         gridBand.RowCount = 2;
                         gridBand.Visible = _col_field.Contains(dtSource.Columns[iRow].ColumnName.ToString()) ? true : false;
+
+                        if (dtSource.Columns[iRow].ColumnName.ToString().Equals("RESULT_RATE"))
+                        {
+                            gridBand.Visible = false;
+                        }
 
                         colBand = new BandedGridColumnEx() { FieldName = dtSource.Columns[iRow].ColumnName.ToString(), Visible = _col_field.Contains(dtSource.Columns[iRow].ColumnName.ToString()) };
                         colBand.Width = 120;
@@ -1027,8 +1040,14 @@ namespace CSI.GMES.KP
                 {
                     if (e.Column.FieldName.ToString().Equals("RESULT_SCORE") && !string.IsNullOrEmpty(e.CellValue.ToString()))
                     {
-                        double _rateQty = Double.Parse(e.CellValue.ToString());
-                        if (_rateQty >= 90)
+                        double _rateQty = (gvwDetail.GetRowCellValue(e.RowHandle, "RESULT_RATE") == null || string.IsNullOrEmpty(gvwDetail.GetRowCellValue(e.RowHandle, "RESULT_RATE").ToString())) ? 0 : Double.Parse(gvwDetail.GetRowCellValue(e.RowHandle, "RESULT_RATE").ToString());
+                        string _value = e.CellValue.ToString();
+
+                        if (_value.Equals("-1"))
+                        {
+
+                        }
+                        else if (_rateQty >= 90)
                         {
                             e.Appearance.BackColor = Color.Green;
                             e.Appearance.ForeColor = Color.White;
@@ -1091,6 +1110,61 @@ namespace CSI.GMES.KP
             catch { }
         }
 
+
+        private void gvwDetail_CustomDrawCell(object sender, DevExpress.XtraGrid.Views.Base.RowCellCustomDrawEventArgs e)
+        {
+            try
+            {
+                if (grdDetail.DataSource == null || gvwDetail.RowCount < 1) return;
+
+                if (e.Column.FieldName.ToString().Contains("RESULT_SCORE"))
+                {
+                    string _value = e.CellValue.ToString();
+
+                    if (_value.Equals("-1"))
+                    {
+                        e.DisplayText = "N/A";
+                    }
+                }
+
+                if (e.Column.FieldName.ToString().Equals("MAX_SCORE"))
+                {
+                    string _value = gvwDetail.GetRowCellValue(e.RowHandle, "RESULT_SCORE").ToString();
+
+                    if (_value.Equals("-1"))
+                    {
+                        e.DisplayText = "N/A";
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private void gvwDetail_CellValueChanged(object sender, DevExpress.XtraGrid.Views.Base.CellValueChangedEventArgs e)
+        {
+            try
+            {
+                if (grdDetail.DataSource == null || gvwDetail.RowCount < 1) return;
+
+                if (e.Column.FieldName.ToString().Contains("RESULT_SCORE"))
+                {
+                    DataTable _dtf = GetDataTable(gvwDetail);
+                    double _total = 0;
+
+                    for (int iRow = 0; iRow < _dtf.Rows.Count - 1; iRow++)
+                    {
+                        if (gvwDetail.GetRowCellValue(iRow, "RESULT_SCORE") != DBNull.Value && !string.IsNullOrEmpty(gvwDetail.GetRowCellValue(iRow, "RESULT_SCORE").ToString()) &&
+                            gvwDetail.GetRowCellValue(iRow, "RESULT_SCORE").ToString().Equals("-1")) continue;
+
+                        _total += Double.Parse(gvwDetail.GetRowCellValue(iRow, "MAX_SCORE").ToString());
+                    }
+
+                    gvwDetail.SetRowCellValue(gvwDetail.RowCount - 1, "MAX_SCORE", _total);
+                }
+            }
+            catch { }
+        }
+
         public bool SaveData(string _type)
         {
             try
@@ -1107,6 +1181,16 @@ namespace CSI.GMES.KP
                 {
                     case "Q_SAVE":
                         DataTable _dtf = BindingData(grdDetail, true, false);
+
+                        for (int iRow = 0; iRow < _dtf.Rows.Count; iRow++)
+                        {
+                            if (_dtf.Rows[iRow]["GRP_CD"].ToString().ToUpper().Equals("TOTAL"))
+                            {
+                                _dtf.Rows.RemoveAt(iRow);
+                                _dtf.AcceptChanges();
+                                continue;
+                            }
+                        }
 
                         for (int iRow = 0; iRow < _dtf.Rows.Count; iRow++)
                         {
@@ -1245,7 +1329,7 @@ namespace CSI.GMES.KP
                         _max_qty = string.IsNullOrEmpty(_dtLink.Rows[iRow]["MAX_SCORE"].ToString()) ? 0 : Int32.Parse(_dtLink.Rows[iRow]["MAX_SCORE"].ToString());
                         _result_qty = string.IsNullOrEmpty(_dtLink.Rows[iRow]["RESULT_SCORE"].ToString()) ? 0 : Int32.Parse(_dtLink.Rows[iRow]["RESULT_SCORE"].ToString());
 
-                        if (_result_qty < 0 || _result_qty > _max_qty)
+                        if (_result_qty < -1 || _result_qty > _max_qty)
                         {
                             MessageBox.Show("Số điểm thực tế phải trong khoảng từ 0 ~ Điểm tối đa!!!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             return;
@@ -1317,26 +1401,34 @@ namespace CSI.GMES.KP
                 {
                     if(!e.Column.FieldName.ToString().Equals("DIV") && !string.IsNullOrEmpty(e.CellValue.ToString()))
                     {
-                        double _rateQty = Double.Parse(e.CellValue.ToString().Replace("%", ""));
-
-                        if (_rateQty >= 90)
+                        if (e.CellValue.ToString().Equals("N/A"))
                         {
-                            e.Appearance.BackColor = Color.Green;
-                            e.Appearance.ForeColor = Color.White;
-                        }
-                        else if (_rateQty >= 80 && _rateQty < 90)
-                        {
-                            e.Appearance.BackColor = Color.Yellow;
-                        }
-                        else if (_rateQty >= 70 && _rateQty < 80)
-                        {
-                            e.Appearance.BackColor = Color.Red;
+                            e.Appearance.BackColor = Color.Black;
                             e.Appearance.ForeColor = Color.White;
                         }
                         else
                         {
-                            e.Appearance.BackColor = Color.Black;
-                            e.Appearance.ForeColor = Color.White;
+                            double _rateQty = Double.Parse(e.CellValue.ToString().Replace("%", ""));
+
+                            if (_rateQty >= 90)
+                            {
+                                e.Appearance.BackColor = Color.Green;
+                                e.Appearance.ForeColor = Color.White;
+                            }
+                            else if (_rateQty >= 80 && _rateQty < 90)
+                            {
+                                e.Appearance.BackColor = Color.Yellow;
+                            }
+                            else if (_rateQty >= 70 && _rateQty < 80)
+                            {
+                                e.Appearance.BackColor = Color.Red;
+                                e.Appearance.ForeColor = Color.White;
+                            }
+                            else
+                            {
+                                e.Appearance.BackColor = Color.Black;
+                                e.Appearance.ForeColor = Color.White;
+                            }
                         }
                     }
                 }
@@ -1822,8 +1914,8 @@ namespace CSI.GMES.KP
                     {
                         if (_dtSummarySource.Rows[iRow]["LINE_CD"].ToString() == _col_nm)
                         {
-                            string _fty_cd = _dtChartSource.Rows[iRow]["FTY_CD"].ToString();
-                            string _line_cd = _dtChartSource.Rows[iRow]["LINE_CD"].ToString();
+                            string _fty_cd = _dtSummarySource.Rows[iRow]["FTY_CD"].ToString();
+                            string _line_cd = _dtSummarySource.Rows[iRow]["LINE_CD"].ToString();
                             string _date = cboMonth.yyyymm;
 
                             ////Disable auto change 
