@@ -1,4 +1,6 @@
 ﻿using DevExpress.Data;
+using DevExpress.Export;
+using DevExpress.Spreadsheet;
 using DevExpress.Utils;
 using DevExpress.XtraCharts;
 using DevExpress.XtraEditors.Repository;
@@ -6,10 +8,12 @@ using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Columns;
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
+using DevExpress.XtraPrinting;
 using JPlatform.Client.Controls6;
 using JPlatform.Client.CSIGMESBaseform6;
 using JPlatform.Client.JBaseForm6;
 using JPlatform.Client.Library6.interFace;
+using MiniExcelLibs;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing.Chart;
 using System;
@@ -38,10 +42,42 @@ namespace CSI.GMES.KP
         public int _tab = 0;
         public DataTable _dtChartSource = null, _dtSummarySource = null;
         public string _state = "MONTH";
+        public string folderPath = "";
 
         public MSKP90020A()
         {
             InitializeComponent();
+
+            SetExportExcel();
+            createFolder();
+        }
+
+        private void SetExportExcel()
+        {
+            gvwSummary.OptionsPrint.PrintHeader = false;
+            gvwSummary.OptionsPrint.AutoWidth = false;
+            gvwSummary.OptionsPrint.UsePrintStyles = true;
+
+            gvwSummary.AppearancePrint.BandPanel.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
+            gvwSummary.AppearancePrint.BandPanel.Font = new Font("Calibri", 14F, FontStyle.Bold);
+            gvwSummary.AppearancePrint.BandPanel.BackColor = Color.FromArgb(180, 198, 231);
+        }
+
+
+        private void createFolder()
+        {
+            folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads") + @"\Excel_MSKP90020A"; // Đường dẫn của thư mục bạn muốn tạo và kiểm tra
+
+            // Kiểm tra xem thư mục đã tồn tại hay chưa
+            if (Directory.Exists(folderPath))
+            {
+                Console.WriteLine("Thư mục đã tồn tại.");
+            }
+            else
+            {
+                // Nếu thư mục chưa tồn tại, tạo mới
+                Directory.CreateDirectory(folderPath);
+            }
         }
 
         protected override void OnLoad(EventArgs e)
@@ -98,7 +134,7 @@ namespace CSI.GMES.KP
 
                     lbDate.Text = "Month";
                     lbDate.Width = 64;
-                    btnExport.Location = new Point(600, 13);
+                    btnExport.Location = new Point(590, 13);
                     lbDate.Location = new Point(3, 13);
                     cboDate.Location = new Point(68, 13);
 
@@ -139,6 +175,7 @@ namespace CSI.GMES.KP
                     btnConfirm.Visible = false;
                     btnUnconfirm.Visible = false;
                     btnExport.Visible = false;
+                    btnExport.Location = new Point(650, 8);
 
                     cboMonth.Visible = true;
                     cboDate.Visible = false;
@@ -1440,84 +1477,249 @@ namespace CSI.GMES.KP
         {
             try
             {
-                DataTable _dtPermiss = GetData("Q_PERMISS");
-                if (_dtPermiss == null || _dtPermiss.Rows.Count < 1)
+                //DataTable _dtPermiss = GetData("Q_PERMISS");
+                //if (_dtPermiss == null || _dtPermiss.Rows.Count < 1)
+                //{
+                //    MessageBox.Show("Bạn không có quyền thực hiện chức năng này!!!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                //    return;
+                //}
+
+                //DialogResult dlr = MessageBox.Show("Bạn có muốn Send Email không?", "Save", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                //if (dlr == DialogResult.Yes)
+                //{
+                //    pbProgressShow();
+
+                //    P_MSKP90020A_EMAIL proc = new P_MSKP90020A_EMAIL();
+                //    DataTable dtDataSet = null;
+                //    dtDataSet = proc.SetParamData(dtDataSet, "Q", cboMonth.yyyymm);
+
+                //    ResultSet rs = CommonCallQuery(dtDataSet, proc.ProcName, proc.GetParamInfo(), false, 90000, "", true);
+                //    if (rs == null || rs.ResultDataSet == null || rs.ResultDataSet.Tables.Count == 0 || rs.ResultDataSet.Tables[0].Rows.Count == 0)
+                //    {
+                //        MessageBoxW("Send failed!", IconType.Warning);
+                //        return;
+                //    }
+
+                //    DataSet dsData = rs.ResultDataSet;
+                //    DataTable dtData = dsData.Tables[0];
+                //    DataTable dtChart = dsData.Tables[1];
+                //    DataTable dtAvg = dsData.Tables[2];
+                //    DataTable dtHtml = dsData.Tables[3];
+
+                //    if (dtData.Rows.Count == 0)
+                //    {
+                //        MessageBoxW("Send failed!", IconType.Warning);
+                //        return;
+                //    }
+
+                //    string _month = dtData.Rows[0]["MM"].ToString();
+                //    string SubjectName = "PD Final Result";
+                //    string htmlReturn = GetHtml(dtData, dtHtml, dtAvg);
+                //    if (htmlReturn == "") return;
+
+                //    /////Image List
+                //    List<string> imgList = new List<string>();
+                //    string[] _col_field = { "A001", "A002" };
+
+                //    for (int iCount = 0; iCount < _col_field.Length; iCount++)
+                //    {
+                //        DataTable dtGroup = dtChart.Select("OPTION_CD = '" + _col_field[iCount] + "'", "").CopyToDataTable();
+                //        string picName = "";
+
+                //        if (dtGroup != null && dtGroup.Rows.Count > 0)
+                //        {
+                //            bool bChart1 = LoadDataChart(dtGroup);
+                //            if (!bChart1) return;
+                //            picName = "LEAN_PD_" + _col_field[iCount];
+                //            CaptureControl(tlpMain, picName);
+                //            imgList.Add(picName);
+                //        }
+                //    }
+
+                //    bool _result = CreateMail(SubjectName, htmlReturn, imgList, "", "", "huynh.it@changshininc.com");
+                //    pbProgressHide();
+
+                //    if (_result)
+                //    {
+                //        MessageBoxW("Send successfully!", IconType.Information);
+                //    }
+                //    else
+                //    {
+                //        MessageBoxW("Send failed!", IconType.Warning);
+                //    }
+                //}
+
+                if (grdSummary.DataSource == null || gvwSummary.RowCount <= 0) return;
+
+                ////////////////////////
+                string _group = cboGroup.EditValue.ToString().Equals("A001") ? "Workshop" : "Support/Admin";
+                string fileName = _group + " PD Summary Report (" + cboDate.yyyymm  + ").xlsx";
+
+                /////Image List
+                List<string> imgList = new List<string>();
+                string picName = "";
+
+                picName = "LEAN_PD_" + cboGroup.EditValue.ToString();
+                CaptureControl(pnChart, picName);
+                imgList.Add(picName);
+
+                // Create an instance of SaveFileDialog
+                SaveFileDialog saveFileDialog = new SaveFileDialog
                 {
-                    MessageBox.Show("Bạn không có quyền thực hiện chức năng này!!!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
+                    Filter = "Excel Files (*.xlsx)|*.xlsx|All Files (*.*)|*.*",
+                    DefaultExt = "xlsx",
+                    FileName = fileName
+                };
+
+                // Show the dialog
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Get the file path selected by the user
+                    string filePath = saveFileDialog.FileName;
+
+                    //////////////////////
+                    gvwSummary.OptionsPrint.AutoWidth = false;
+                    gvwSummary.OptionsPrint.UsePrintStyles = true;
+                    gvwSummary.AppearancePrint.BandPanel.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
+                    gvwSummary.AppearancePrint.BandPanel.Font = new Font("Tahoma", 8F, FontStyle.Bold);
+                    gvwSummary.AppearancePrint.BandPanel.BackColor = Color.FromArgb(192, 192, 192);
+                    gvwSummary.AppearancePrint.BandPanel.ForeColor = Color.Blue;
+                    gvwSummary.BandPanelRowHeight = 30;
+                    gvwSummary.RowHeight = 25;
+                    gvwSummary.OptionsView.AllowCellMerge = false;
+
+                    XlsxExportOptionsEx exportOptions = new XlsxExportOptionsEx
+                    {
+                        ExportType = ExportType.WYSIWYG, // Giữ định dạng giống như đang hiển thị trên lưới
+                        SheetName = "Sheet 1",
+                        ShowColumnHeaders = DevExpress.Utils.DefaultBoolean.False,
+                        // TextExportMode = TextExportMode.Text
+                        // Thêm các thiết lập khác (nếu cần)
+                    };
+                    grdSummary.ExportToXlsx(filePath, exportOptions);
+
+                    ////////////
+                    Format_Excel(filePath, imgList);
+                    gvwSummary.OptionsView.AllowCellMerge = true;
+                    Formart_Grid_Summary();
+                }
+            }
+            catch (Exception ex)
+            {
+                //pbProgressHide();
+                throw;
+            }
+        }
+
+        public void Format_Excel(string filePath, List<string> imgList)
+        {
+            try
+            {
+                ///////////////
+                Workbook wb = new Workbook();
+                wb.LoadDocument(filePath);
+
+                ///////////////
+                Worksheet ws = wb.Worksheets[0];
+
+                // Tạo worksheet mới trong workbook chính
+                ws.Cells.Font.Name = "Tahoma";
+                ws.Cells.Font.Size = 8;
+                ws.Cells.Alignment.Horizontal = SpreadsheetHorizontalAlignment.Center;
+                ws.Cells.Alignment.Vertical = SpreadsheetVerticalAlignment.Center;
+
+                //ws.Rows.Insert(0, 3);
+                ws.GetUsedRange().Borders.SetAllBorders(Color.Empty, BorderLineStyle.None);
+
+                // Tắt hiển thị đường lưới (gridlines)
+                ws.ActiveView.ShowGridlines = false;
+
+                int rowCount = ws.GetUsedRange().RowCount;
+                int colCount = ws.GetUsedRange().ColumnCount;
+                DevExpress.Spreadsheet.Range groupRange = null;
+                DevExpress.Spreadsheet.Range headerRange = null;
+
+                ////////////////
+                ws.Rows[0].RowHeight = 100;
+                headerRange = ws.Range.FromLTRB(0, 0, colCount - 1, 1);
+                headerRange.Font.Bold = true;
+                headerRange.Font.Size = 8;
+                headerRange.FillColor = Color.FromArgb(192, 192, 192);
+                headerRange.Font.Color = Color.Blue;
+
+                headerRange.Borders.SetOutsideBorders(Color.FromArgb(30, 30, 30), BorderLineStyle.Thick);
+                headerRange.Borders.InsideHorizontalBorders.LineStyle = BorderLineStyle.Thick;
+                headerRange.Borders.InsideVerticalBorders.LineStyle = BorderLineStyle.Thick;
+                headerRange.Borders.InsideHorizontalBorders.Color = Color.FromArgb(30, 30, 30);
+                headerRange.Borders.InsideVerticalBorders.Color = Color.FromArgb(30, 30, 30);
+
+                for (int row = 2; row < rowCount; row++)
+                {
+                    groupRange = ws.Range.FromLTRB(0, row, colCount - 1, row);
+                    groupRange.Borders.RightBorder.LineStyle = BorderLineStyle.Thin;
+                    groupRange.Borders.RightBorder.Color = Color.FromArgb(30, 30, 30);
+                    groupRange.Borders.BottomBorder.LineStyle = BorderLineStyle.Thin;
+                    groupRange.Borders.BottomBorder.Color = Color.FromArgb(30, 30, 30);
+                    groupRange.Borders.InsideVerticalBorders.LineStyle = BorderLineStyle.Thin;
+                    groupRange.Borders.InsideVerticalBorders.Color = Color.FromArgb(30, 30, 30);
+                    ws.Rows[row].RowHeight = 80;
                 }
 
-                DialogResult dlr = MessageBox.Show("Bạn có muốn Send Email không?", "Save", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                if (dlr == DialogResult.Yes)
+                for (int iCol = 2; iCol <= colCount; iCol++)
                 {
-                    pbProgressShow();
+                    ws.Columns[iCol].AutoFit();
+                }
 
-                    P_MSKP90020A_EMAIL proc = new P_MSKP90020A_EMAIL();
-                    DataTable dtDataSet = null;
-                    dtDataSet = proc.SetParamData(dtDataSet, "Q", cboMonth.yyyymm);
+                for (int j = 0; j < colCount; j++)
+                {
+                    ws.Cells[3, j].Value = ws.Cells[3, j].Value + "%";
+                }
 
-                    ResultSet rs = CommonCallQuery(dtDataSet, proc.ProcName, proc.GetParamInfo(), false, 90000, "", true);
-                    if (rs == null || rs.ResultDataSet == null || rs.ResultDataSet.Tables.Count == 0 || rs.ResultDataSet.Tables[0].Rows.Count == 0)
+                ////// Thêm 3 dòng vào đầu trang (hàng 0)
+                ws.Rows.Insert(0, 25);
+
+                ////// Thêm image
+                if (imgList != null)
+                {
+                    string pic = imgList[0];
+                    string pathPic = "";
+
+                    if (pic.Contains("\\"))
                     {
-                        MessageBoxW("Send failed!", IconType.Warning);
-                        return;
-                    }
-
-                    DataSet dsData = rs.ResultDataSet;
-                    DataTable dtData = dsData.Tables[0];
-                    DataTable dtChart = dsData.Tables[1];
-                    DataTable dtAvg = dsData.Tables[2];
-                    DataTable dtHtml = dsData.Tables[3];
-
-                    if (dtData.Rows.Count == 0)
-                    {
-                        MessageBoxW("Send failed!", IconType.Warning);
-                        return;
-                    }
-
-                    string _month = dtData.Rows[0]["MM"].ToString();
-                    string SubjectName = "PD Final Result";
-                    string htmlReturn = GetHtml(dtData, dtHtml, dtAvg);
-                    if (htmlReturn == "") return;
-
-                    /////Image List
-                    List<string> imgList = new List<string>();
-                    string[] _col_field = { "A001", "A002" };
-
-                    for (int iCount = 0; iCount < _col_field.Length; iCount++)
-                    {
-                        DataTable dtGroup = dtChart.Select("OPTION_CD = '" + _col_field[iCount] + "'", "").CopyToDataTable();
-                        string picName = "";
-
-                        if (dtGroup != null && dtGroup.Rows.Count > 0)
-                        {
-                            bool bChart1 = LoadDataChart(dtGroup);
-                            if (!bChart1) return;
-                            picName = "LEAN_PD_" + _col_field[iCount];
-                            CaptureControl(tlpMain, picName);
-                            imgList.Add(picName);
-                        }
-                    }
-
-                    bool _result = CreateMail(SubjectName, htmlReturn, imgList, "", "", "huynh.it@changshininc.com");
-                    pbProgressHide();
-
-                    if (_result)
-                    {
-                        MessageBoxW("Send successfully!", IconType.Information);
+                        pathPic = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + pic;
                     }
                     else
                     {
-                        MessageBoxW("Send failed!", IconType.Warning);
+                        pic = pic.Contains(".") ? pic : pic + ".png";
+                        pathPic = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + $@"\GMES_LFA_Capture\{pic}";
                     }
+
+                    Image image = Image.FromFile(pathPic);
+
+                    // Add image tại cell B2
+                    Picture picture = ws.Pictures.AddPicture(
+                        image,
+                        ws.Cells["A1"]
+                    );
+
+                    // chỉnh kích thước nếu cần
+                    picture.Width = 3000;
+                    picture.Height = 1500;
                 }
+
+                //////////
+                foreach (Worksheet ws1 in wb.Worksheets)
+                {
+                    ws1.ActiveView.Zoom = 100; // Zoom mặc định 100%
+                }
+                wb.Worksheets.ActiveWorksheet = wb.Worksheets[0];
+
+                // Lưu
+                wb.SaveDocument(filePath, DocumentFormat.OpenXml);
+                wb.Dispose();
             }
-            catch
-            {
-                pbProgressHide();
-                throw;
-            }
+            catch (Exception ex) { }
         }
 
         public bool LoadDataChart(DataTable argDt)

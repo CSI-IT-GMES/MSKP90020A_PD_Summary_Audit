@@ -438,11 +438,11 @@
             // 
             this.btnExport.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnExport.Image = ((System.Drawing.Image)(resources.GetObject("btnExport.Image")));
-            this.btnExport.Location = new System.Drawing.Point(420, 8);
+            this.btnExport.Location = new System.Drawing.Point(407, 8);
             this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(115, 25);
+            this.btnExport.Size = new System.Drawing.Size(128, 25);
             this.btnExport.TabIndex = 549;
-            this.btnExport.Text = "Send Email";
+            this.btnExport.Text = "Export Excel";
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
             // lbBlack
